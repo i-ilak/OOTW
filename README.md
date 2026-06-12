@@ -1,30 +1,70 @@
-# My Garmin Watch Face
-This repository contains a custom watchface designed in MonkeyC for Garmin Forerunner 265S.
+# Out Of The Way
+
+A minimal watchface for the Garmin Forerunner 265S, written in Monkey C.
 
 <p align="center">
-  <img src="https://github.com/azyleee/My-Garmin-Watch-Face/blob/main/SuperSimple/images/AOD.jpg" alt="Always-On Mode" width=500/>
+  <img src="docs/preview.png" alt="OOTW running on a Forerunner 265S" width="280">
 </p>
 
-<p align="center">
-  <img src="https://github.com/azyleee/My-Garmin-Watch-Face/blob/main/SuperSimple/images/HighPowerMode.JPG" alt="High-Power Mode" width=500/>
-</p>
+Forked from [azyleee/My-Garmin-Watch-Face](https://github.com/azyleee/My-Garmin-Watch-Face), which is MIT-licensed; this fork inherits the same license.
 
-## Description
-The watchface is crafted to offer a perfect blend of functionality, minimalist aesthetics, and beauty. Drawing inspiration from Google design language and typography, it presents a clean and elegant display on your Garmin watch.
+## Layout
 
-## Usage
+- 24-hour time, centered (Garmin system vector font for crisp AMOLED rendering)
+- Day-of-week + day-of-month, above the time
+- Battery percentage, top
+- Weather (°C) / Steps / Heart rate, bottom row
+- Dimmed time + date only in always-on / sleep mode
 
-To load the watch face onto your 265S, load the [PRG file](My-Garmin-Watch-Face/SuperSimple/export/v2/SuperSimple-v2.prg) into the Apps folder of your 265S when it is plugged into your PC.
+## Build
 
-To edit or modify the watch face, the main file of the watch face is the [SuperSimpleView.mc](My-Garmin-Watch-Face/SuperSimple\source\SuperSimpleView.mc) in the "source" folder. You must then build and export a new PRG file to load onto your 265S.
+Prerequisites (macOS, one-time setup):
 
+1. **JDK 21**
+   ```sh
+   brew install openjdk@21
+   ```
+2. **Connect IQ SDK Manager** — download from [developer.garmin.com/connect-iq/sdk](https://developer.garmin.com/connect-iq/sdk/), install the DMG.
+3. Open the SDK Manager and install:
+   - Connect IQ **SDK 9.2.0** (or newer)
+   - The **Forerunner 265S** device profile
+4. **Developer signing key**:
+   ```sh
+   mkdir -p ~/.Garmin/ConnectIQ
+   openssl genrsa -out ~/.Garmin/ConnectIQ/developer_key.pem 4096
+   openssl pkcs8 -topk8 -inform PEM -outform DER \
+     -in ~/.Garmin/ConnectIQ/developer_key.pem \
+     -out ~/.Garmin/ConnectIQ/developer_key.der -nocrypt
+   ```
 
-## Features
-Functional Design: Prioritizing utility, the watchface ensures all essential information is easily accessible at a glance.
-Battery Efficiency: Engineered to optimize battery consumption, sacrificing no functionality from a traditional watch.
+Compile (from repo root):
 
-## Prerequisites
-Before installing and using this custom watchface, ensure you have the Garmin Connect IQ SDK installed on your development environment. You can download the SDK from [Garmin Connect IQ SDK](https://developer.garmin.com/connect-iq/overview/).
+```sh
+SDK="$(cat "$HOME/Library/Application Support/Garmin/ConnectIQ/current-sdk.cfg")"
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+mkdir -p bin
+"$SDK/bin/monkeyc" -o bin/OOTW.prg -f monkey.jungle \
+  -y ~/.Garmin/ConnectIQ/developer_key.der -d fr265s -w
+```
+
+Output: `bin/OOTW.prg`.
+
+## Install on the watch
+
+The Forerunner 265S uses MTP, so macOS does not mount it as a disk. Use an MTP browser to copy the file:
+
+1. Install [OpenMTP](https://openmtp.ganeshrvel.com/) (free) — Android File Transfer also works.
+2. Connect the watch with a USB-C **data** cable.
+3. In OpenMTP, navigate to `Internal Storage / GARMIN / APPS /`.
+4. Drag `bin/OOTW.prg` into `APPS/`.
+5. Unplug. On the watch: **Settings → Watch Face → Connect IQ → OOTW**.
+
+If Garmin Express is open it will hold the MTP connection — quit it first.
 
 ## License
-This project is licensed under the MIT License.
+
+MIT, inherited from the upstream [azyleee/My-Garmin-Watch-Face](https://github.com/azyleee/My-Garmin-Watch-Face).
+
+---
+
+_Disclaimer: the changes in this fork on top of the upstream were generated through agentic coding. Use at your own risk; no warranty is provided or implied._

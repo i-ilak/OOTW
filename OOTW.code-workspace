@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "OOTW",
+			"path": "."
+		}
+	],
+	"settings": {
+		"monkeyC.javaPath": "/opt/homebrew/opt/openjdk@21/bin/java",
+		"monkeyC.developerKeyPath": "/Users/iilak/.Garmin/ConnectIQ/developer_key.der",
+		"monkeyC.typeCheckLevel": "Strict"
+	}
+}
